@@ -1,13 +1,15 @@
 import math
 import os
+import re
 
 from scipy.stats import binom
 
 from tartarus.PorterStemmer import PorterStemmer
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-NEG_FILES_PATH = os.path.join(ROOT_DIR, "..", "data", "neg_token")
-POS_FILES_PATH = os.path.join(ROOT_DIR, "..", "data", "pos_token")
+DATA_DIR = os.path.join(ROOT_DIR, "..", "data")
+NEG_FILES_PATH = os.path.join(DATA_DIR, "neg_token")
+POS_FILES_PATH = os.path.join(DATA_DIR, "pos_token")
 
 
 def sign_test(actual_classes, a_predictions, b_predictions, features):
@@ -89,3 +91,12 @@ def run_experiment(nb_class, svm_class, text):
     sign_test(nb_act, nb_pred, svm_pred, text)
     nb_class.eval_and_print(nb_act, nb_pred)
     svm_class.eval_and_print(svm_act, svm_pred)
+
+
+def clean_data(text):
+    norm_text = text.lower()
+    # Replace breaks with spaces
+    norm_text = norm_text.replace('<br />', ' ')
+    # Pad punctuation with spaces on both sides
+    norm_text = re.sub(r"([\.\",\(\)!\?;:])", " \\1 ", norm_text)
+    return norm_text
